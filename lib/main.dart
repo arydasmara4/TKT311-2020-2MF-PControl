@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
+//import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:login/loginscreen.dart';
 
 void main() => runApp(MyApp());
@@ -15,4 +15,8 @@ class MyApp extends StatelessWidget {
       home: Login(),
     );
   }
+}
+
+class FlutterStatusbarcolor {
+  static void setStatusBarColor(MaterialColor green) {}
 }
