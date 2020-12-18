@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:login/homepage.dart';
-import 'package:login/signup.dart';
-import 'package:login/tab_akun.dart';
+import 'package:login/auth_service.dart';
+import 'package:login/guru/homepage.dart';
+import 'package:login/guru/signup.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -9,29 +9,15 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  String username = "hanz";
-  String password = "mantapjiwa";
   String alert = "siap login";
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  TextEditingController usernameInput = new TextEditingController();
+  TextEditingController emailInput = new TextEditingController();
   TextEditingController passwordInput = new TextEditingController();
 
-  void prosesLogin() {
-    if (_formKey.currentState.validate()) {
-      if (usernameInput.text == username && passwordInput.text == password) {
-        Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) => Homepage(Akun(
-                      username: usernameInput.text,
-                    ))));
-      }
-    } else {
-      setState(() {
-        alert = "Username atau password Salah";
-      });
-    }
+  void halamanutama() {
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => Homepage(null)));
   }
 
   void register() {
@@ -77,9 +63,9 @@ class _LoginState extends State<Login> {
               child: Column(
                 children: <Widget>[
                   TextFormField(
-                      controller: usernameInput,
-                      validator: (value) {
-                        if (value.isEmpty) {
+                      controller: emailInput,
+                      validator: (e) {
+                        if (e.isEmpty) {
                           return "Isi Username Anda";
                         }
 
@@ -106,8 +92,8 @@ class _LoginState extends State<Login> {
                   ),
                   TextFormField(
                       controller: passwordInput,
-                      validator: (value) {
-                        if (value.isEmpty) {
+                      validator: (e) {
+                        if (e.isEmpty) {
                           return "Isi Password Anda";
                         }
 
@@ -131,24 +117,27 @@ class _LoginState extends State<Login> {
                     height: 10,
                   ),
                   Card(
-                    color: Colors.black87,
+                    color: Colors.green,
                     elevation: 5,
                     child: Container(
-                      height: 35.0,
-                      child: InkWell(
-                        splashColor: Colors.white,
-                        onTap: () => prosesLogin(),
-                        child: Center(
-                          child: Text(
-                            "Masuk",
-                            style: TextStyle(fontSize: 20, color: Colors.white),
-                          ),
-                        ),
-                      ),
-                    ),
+                        height: 35.0,
+                        child: InkWell(
+                            splashColor: Colors.white,
+                            child: Center(
+                              child: Text(
+                                "Masuk",
+                                style: TextStyle(
+                                    fontSize: 20, color: Colors.white),
+                              ),
+                            ),
+                            onTap: () async {
+                              await AuthServices.signIn(
+                                  emailInput.text, passwordInput.text);
+                              halamanutama();
+                            })),
                   ),
                   Card(
-                    color: Colors.black87,
+                    color: Colors.green,
                     elevation: 5,
                     child: Container(
                       height: 35.0,
@@ -157,7 +146,7 @@ class _LoginState extends State<Login> {
                         splashColor: Colors.white,
                         child: Center(
                           child: Text(
-                            "Create Account",
+                            "Buat Akun",
                             style: TextStyle(fontSize: 20, color: Colors.white),
                           ),
                         ),
