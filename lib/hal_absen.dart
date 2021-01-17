@@ -3,7 +3,6 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 
 List<String> _presensi = ['Hadir', 'Absen', 'Sakit', 'Izin'];
-//tring _selectedPresensi;
 
 class HalamanAbsen extends StatefulWidget {
   final String pertemuan;
@@ -21,8 +20,9 @@ class _HalamanAbsenState extends State<HalamanAbsen> {
     super.initState();
     _ref = FirebaseDatabase.instance
         .reference()
-        .child('siswa')
-        .orderByChild("nis");
+        .child('siswa_pertemuan')
+        .orderByChild("pertemuan_ke")
+        .equalTo(widget.pertemuan);
   }
 
   @override
@@ -30,13 +30,13 @@ class _HalamanAbsenState extends State<HalamanAbsen> {
     return Scaffold(
       appBar: AppBar(
         title: Text("Pertemuan Ke : " + widget.pertemuan),
+        backgroundColor: Colors.green,
       ),
       body: Container(
         padding: EdgeInsets.only(top: 5, left: 3, right: 3),
         height: double.infinity,
         child: FirebaseAnimatedList(
           query: _ref,
-          //itemCount: itemCount,
           itemBuilder: (BuildContext context, DataSnapshot snapshot,
               Animation<double> animation, int index) {
             Map daftar = snapshot.value;
@@ -63,106 +63,153 @@ class ListSiswa extends StatefulWidget {
 
 class _ListSiswaState extends State<ListSiswa> {
   String _selectedPresensi;
+  String teks = "";
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  TextEditingController nilai = new TextEditingController();
+
+  DatabaseReference presensiSiswa = FirebaseDatabase.instance
+    .reference()
+    .child('presensi');
+
+  absen() {
+    presensiSiswa.push().set({
+      'nama': widget.daftar['nama'],
+      'nis' : widget.daftar['nis'],
+      'absensi': _selectedPresensi,
+      'nilai' : nilai.text,
+      'mata_pelajaran' : widget.daftar['mata_pelajaran'],
+      'pertemuan_ke': widget.daftar['pertemuan_ke'],
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Card(
-      //margin: EdgeInsets.symmetric(vertical: 5),
-      //padding: EdgeInsets.all(5),
+    return Container(
       color: Colors.green[300],
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: <Widget>[
+      padding: EdgeInsets.all(20),
+      child: Column(
+        children: [
           Row(
-            children: [
-              Icon(
-                Icons.person,
-                color: Colors.white,
-                size: 45,
-              ),
-              SizedBox(
-                width: 6,
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: <Widget>[
+              Row(
                 children: [
-                  Row(
+                  Icon(
+                    Icons.person,
+                    color: Colors.white,
+                    size: 45,
+                  ),
+                  SizedBox(
+                    width: 6,
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        "Nama :",
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white),
+                      Row(
+                        children: [
+                          Text(
+                            "Nama :",
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white),
+                          ),
+                          SizedBox(
+                            width: 6,
+                          ),
+                          Text(
+                            widget.daftar['nama'],
+                            style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white),
+                          ),
+                          SizedBox(
+                            width: 6,
+                          ),
+                        ],
                       ),
                       SizedBox(
-                        width: 6,
+                        height: 6,
                       ),
-                      Text(
-                        widget.daftar['nama'],
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white),
+                      Container(
+                        child: Row(
+                          children: [
+                            Text(
+                              "NIS :",
+                              style: TextStyle(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white),
+                            ),
+                            SizedBox(
+                              width: 6,
+                            ),
+                            Text(
+                              widget.daftar['nis'],
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                       SizedBox(
-                        width: 6,
+                        width: 200,
                       ),
                     ],
                   ),
-                  SizedBox(
-                    height: 6,
-                  ),
-                  Container(
-                    child: Row(
-                      children: [
-                        Text(
-                          "NIS :",
-                          style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white),
-                        ),
-                        SizedBox(
-                          width: 6,
-                        ),
-                        Text(
-                          widget.daftar['nis'],
-                          style: TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
                 ],
+              ),
+              Center(
+                child: Container(
+                  child: DropdownButton(
+                    hint: Text('Kehadiran'),
+                    value: _selectedPresensi,
+                    onChanged: (newValue) {
+                      setState(() {
+                        _selectedPresensi = newValue;
+                      });
+                    },
+                    items: _presensi.map((location) {
+                      return DropdownMenuItem(
+                        child: new Text(location),
+                        value: location,
+                      );
+                    }).toList(),
+                  ),
+                ),
               ),
             ],
           ),
           Center(
             child: Container(
-              child: DropdownButton(
-                hint: Text('pilih'), // Not necessary for Option 1
-
-                value: _selectedPresensi,
-                onChanged: (newValue) {
-                  setState(() {
-                    _selectedPresensi = newValue;
-                  });
-                },
-                items: _presensi.map((location) {
-                  return DropdownMenuItem(
-                    child: new Text(location),
-                    value: location,
-                  );
-                }).toList(),
+              child: TextField(
+                key: _formKey,
+                keyboardType: TextInputType.number,
+                controller: nilai,
+              ),
+            )
+          ),
+          RaisedButton(
+            child: Text(
+              "Save",
+              style: TextStyle(
+                color: Colors.black
               ),
             ),
-          ),
-        ],
-      ),
+            color: Colors.white,
+            onPressed: (){
+              absen();
+              nilai.text="";
+            },
+          )
+        ]
+      )
     );
   }
 }
