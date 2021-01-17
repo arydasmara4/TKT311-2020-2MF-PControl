@@ -1,30 +1,49 @@
+import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'tab_home.dart' as beranda;
+import 'package:flutter/cupertino.dart';
+import 'package:login/ortu/input_nis.dart' as beranda;
 import 'tab_akun.dart' as profile;
 
 class Homepage extends StatefulWidget {
-  final String username;
-
-  Homepage(profile.Akun akun, {this.username});
-
   @override
   _HomepageState createState() => _HomepageState();
 }
 
-class _HomepageState extends State<Homepage>
-    with SingleTickerProviderStateMixin {
+class _HomepageState extends State<Homepage> with SingleTickerProviderStateMixin {
   TabController controller;
+
+  static FirebaseAuth _auth = FirebaseAuth.instance;
+
+  String uid;
+
+  Timer timer;
+  int counter = 0;
+
+  queryId()async{
+    final FirebaseUser user = await _auth.currentUser();
+    uid = user.uid.toString();
+  }
 
   @override
   void initState() {
-    controller = new TabController(length: 2, vsync: this);
     super.initState();
+    queryId();
+    timer = Timer.periodic(Duration(seconds: 1), (Timer t) => addValue());
+    controller = new TabController(length: 2, vsync: this);
   }
 
   @override
   void dispose() {
-    controller.dispose();
     super.dispose();
+    timer?.cancel();
+    controller.dispose();
+  }
+
+  void addValue() {
+    setState(() {
+       counter++; 
+    });
   }
 
   @override
@@ -37,10 +56,10 @@ class _HomepageState extends State<Homepage>
           controller: controller,
           tabs: <Widget>[
             new Tab(
-              icon: new Icon(Icons.home),
+              icon: new Icon(Icons.person),
             ),
             new Tab(
-              icon: new Icon(Icons.person),
+              icon: new Icon(Icons.home),
             ),
           ],
         ),
@@ -48,8 +67,10 @@ class _HomepageState extends State<Homepage>
       body: new TabBarView(
         controller: controller,
         children: <Widget>[
-          new beranda.Tabhome(),
-          new profile.Akun(),
+          new profile.Akun(
+            unik: uid,
+          ),
+          new beranda.BuatKelas(),
         ],
       ),
     );
