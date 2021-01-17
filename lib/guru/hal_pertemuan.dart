@@ -31,7 +31,7 @@ class _PertemuanState extends State<Pertemuan> {
         .reference()
         .child('pertemuan')
         .orderByChild("mata_pelajaran")
-        .equalTo(widget.pelajaran);
+        .equalTo(widget.pelajaran); 
   }
 
   void pindahHalAbsen() {
@@ -44,24 +44,27 @@ class _PertemuanState extends State<Pertemuan> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.pelajaran),
+        backgroundColor: Colors.green,
       ),
       body: Container(
         padding: EdgeInsets.only(top: 5, left: 3, right: 3),
         height: double.infinity,
         child: FirebaseAnimatedList(
           query: _ref,
-          //itemCount: itemCount,
           itemBuilder: (BuildContext context, DataSnapshot snapshot,
               Animation<double> animation, int index) {
             Map daftar = snapshot.value;
             return GestureDetector(
-                onTap: () => Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => HalamanAbsen(
-                              pertemuan: daftar['pertemuan_ke'],
-                            ))),
-                child: _dataPertemuan(daftar: daftar));
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => HalamanAbsen(
+                    pertemuan: daftar['pertemuan_ke'],
+                  )
+                )
+              ),
+            child: _dataPertemuan(daftar: daftar)
+            );
           },
         ),
       ),
@@ -77,8 +80,6 @@ class _PertemuanState extends State<Pertemuan> {
 
 Widget _dataPertemuan({Map daftar}) {
   return Card(
-    //margin: EdgeInsets.symmetric(vertical: 5),
-    //padding: EdgeInsets.all(5),
     color: Colors.green[300],
     child: Row(
       children: <Widget>[

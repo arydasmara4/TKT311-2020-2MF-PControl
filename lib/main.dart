@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:login/welcomescreen.dart';
 
-
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
